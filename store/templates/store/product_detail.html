@@ -1,0 +1,91 @@
+{% extends 'store/base.html' %}
+
+{% block title %}{{ product.name }} - BCT E-Commerce{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-6 mb-4">
+        <div class="card p-3 shadow-sm border-0 bg-white rounded-4">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+            {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 400px;">
+                    <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h2 class="fw-bold">{{ product.name }}</h2>
+        <h3 class="text-success fw-bold">₹{{ product.price }}</h3>
+        <p class="text-muted"><i class="bi bi-shop me-2"></i>Sold by: <strong>{{ product.store.name }}</strong></p>
+        
+        <p class="mt-4">{{ product.description }}</p>
+        
+        {% if certificate %}
+        <div class="alert alert-info mt-4">
+            <h5><i class="bi bi-patch-check-fill text-primary me-2"></i>Certified Product</h5>
+            <p class="mb-1"><strong>Title:</strong> {{ product.certificate.title }}</p>
+            <p class="mb-1"><strong>Validation ID:</strong> {{ product.certificate.validation_id }}</p>
+            <p class="mb-0 small text-muted">Issued at: {{ product.certificate.issued_at }}</p>
+        </div>
+        {% endif %}
+        
+        <form action="{% url 'buy_product' product.pk %}" method="post" class="mt-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 shadow"><i class="bi bi-cart-plus me-2"></i>Buy Now</button>
+        </form>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <hr>
+        <h3 class="mb-4">Customer Reviews</h3>
+        
+        <div class="row">
+            <div class="col-md-7">
+                {% for review in reviews %}
+                <div class="card mb-3 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="fw-bold"><i class="bi bi-person-circle me-2"></i>{{ review.user.username }}</h6>
+                            <span class="badge bg-warning text-dark"><i class="bi bi-star-fill me-1"></i>{{ review.rating }}/5</span>
+                        </div>
+                        <p class="mt-2 mb-1">{{ review.text }}</p>
+                        <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+                {% endfor %}
+            </div>
+            
+            <div class="col-md-5">
+                <div class="card border-0 shadow-sm bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">Leave a Review</h5>
+                        {% if user.is_authenticated %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="{{ form.rating.id_for_label }}" class="form-label">Rating (1-5)</label>
+                                {{ form.rating }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.text.id_for_label }}" class="form-label">Review</label>
+                                {{ form.text }}
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 rounded-pill">Submit Review</button>
+                        </form>
+                        {% else %}
+                        <p>You must be logged in to leave a review.</p>
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-outline-primary w-100 rounded-pill">Login to Review</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

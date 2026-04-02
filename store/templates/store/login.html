@@ -1,0 +1,39 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Login - BCT E-Commerce{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4 fw-bold">Welcome Back</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ field.errors|striptags }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill mt-3 py-2 fw-bold">Login</button>
+                    <input type="hidden" name="next" value="{{ next }}" />
+                </form>
+                <div class="text-center mt-4">
+                    <p class="mb-0">Don't have an account? <a href="{% url 'register' %}" class="text-decoration-none fw-bold">Register here</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add bootstrap form control class to inputs
+    document.querySelectorAll('input').forEach(e => e.classList.add('form-control'));
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Create Store - BCT E-Commerce{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <h3 class="card-title text-center text-primary mb-4 fw-bold"><i class="bi bi-shop me-2"></i>Create Your Store</h3>
+                <p class="text-center text-muted mb-4">Set up a store profile to start selling products directly to customers.</p>
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in field.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 mt-3 fw-bold">Create Store</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

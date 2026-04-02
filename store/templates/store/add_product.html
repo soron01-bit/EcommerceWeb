@@ -1,0 +1,35 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Add Product - BCT E-Commerce{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="card-title text-primary fw-bold mb-0"><i class="bi bi-box me-2"></i>Add New Product</h3>
+                    <a href="{% url 'my_store' %}" class="btn btn-outline-secondary btn-sm rounded-pill"><i class="bi bi-arrow-left me-1"></i>Back to Store</a>
+                </div>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in field.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 mt-3 fw-bold">Add Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

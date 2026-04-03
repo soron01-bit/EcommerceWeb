@@ -103,3 +103,20 @@ def add_product(request):
     else:
         form = ProductForm()
     return render(request, 'store/add_product.html', {'form': form})
+
+# Edit product view
+from django.http import HttpResponseForbidden
+@login_required
+def edit_product(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    if product.store.owner != request.user:
+        return HttpResponseForbidden("You are not allowed to edit this product.")
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Product updated successfully!')
+            return redirect('my_store')
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'store/edit_product.html', {'form': form, 'product': product})

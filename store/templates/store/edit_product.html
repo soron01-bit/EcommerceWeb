@@ -1,0 +1,21 @@
+{% extends 'store/base.html' %}
+{% block title %}Edit Product - BCT E-Commerce{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h2 class="mb-4 fw-bold">Edit Product</h2>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold">Update Product</button>
+                        <a href="{% url 'my_store' %}" class="btn btn-secondary rounded-pill ms-2">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

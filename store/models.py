@@ -16,9 +16,23 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    stock = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
+    
+    @property
+    def is_in_stock(self):
+        return self.stock > 0
+    
+    @property
+    def stock_status(self):
+        if self.stock > 10:
+            return 'In Stock'
+        elif self.stock > 0:
+            return 'Low Stock'
+        else:
+            return 'Out of Stock'
 
 class ProductCertificate(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='certificate')

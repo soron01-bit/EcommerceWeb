@@ -1,19 +1,43 @@
 {% extends 'store/base.html' %}
 {% block title %}Edit Product - BCT E-Commerce{% endblock %}
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h2 class="mb-4 fw-bold">Edit Product</h2>
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <button type="submit" class="btn btn-primary rounded-pill fw-bold">Update Product</button>
-                        <a href="{% url 'my_store' %}" class="btn btn-secondary rounded-pill ms-2">Cancel</a>
-                    </form>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="card-title text-primary fw-bold mb-0"><i class="bi bi-pencil me-2"></i>Edit Product</h3>
+                    <a href="{% url 'my_store' %}" class="btn btn-outline-secondary btn-sm rounded-pill"><i class="bi bi-arrow-left me-1"></i>Back to Store</a>
                 </div>
+                
+                <div class="alert alert-info py-2 mb-4" role="alert">
+                    <small><i class="bi bi-info-circle me-2"></i>Update product details including stock availability below</small>
+                </div>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in field.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold">
+                            <i class="bi bi-check-circle me-2"></i>Update Product
+                        </button>
+                        <a href="{% url 'my_store' %}" class="btn btn-outline-secondary rounded-pill px-5 py-2 fw-bold">
+                            <i class="bi bi-x-circle me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

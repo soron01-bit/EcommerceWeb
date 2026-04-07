@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Product, Review, Store
+from .models import Product, Review, Store, Cart, CartItem
 from .forms import CustomUserCreationForm, ReviewForm, StoreForm, ProductForm
 
 def home(request):
@@ -120,3 +120,70 @@ def edit_product(request, pk):
     else:
         form = ProductForm(instance=product)
     return render(request, 'store/edit_product.html', {'form': form, 'product': product})
+
+@login_required
+def add_to_cart(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    
+    # Get or create cart for the user
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    
+    # Get quantity from POST request
+    quantity = int(request.POST.get('quantity', 1))
+    
+    # Check if product already in cart
+    cart_item, item_created = CartItem.objects.get_or_create(
+        cart=cart,
+        product=product,
+        defaults={'quantity': quantity}
+    )
+    
+    if not item_created:
+        # If already in cart, increase quantity
+        cart_item.quantity += quantity
+        cart_item.save()
+    
+    messages.success(request, f'{product.name} added to cart!')
+    return redirect('product_detail', pk=pk)
+
+@login_required
+def view_cart(request):
+    try:
+        cart = Cart.objects.get(user=request.user)
+        cart_items = cart.items.all()
+        total_price = cart.get_total_price()
+    except Cart.DoesNotExist:
+        cart = None
+        cart_items = []
+        total_price = 0
+    
+    return render(request, 'store/cart.html', {
+        'cart': cart,
+        'cart_items': cart_items,
+        'total_price': total_price,
+    })
+
+@login_required
+def update_cart_item(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+    
+    if request.method == 'POST':
+        quantity = int(request.POST.get('quantity', 1))
+        
+        if quantity <= 0:
+            cart_item.delete()
+            messages.success(request, 'Item removed from cart.')
+        else:
+            cart_item.quantity = quantity
+            cart_item.save()
+            messages.success(request, 'Cart updated.')
+    
+    return redirect('view_cart')
+
+@login_required
+def remove_from_cart(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+    product_name = cart_item.product.name
+    cart_item.delete()
+    messages.success(request, f'{product_name} removed from cart.')
+    return redirect('view_cart')

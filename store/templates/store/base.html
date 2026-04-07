@@ -30,6 +30,9 @@
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
+                            <a class="nav-link fw-semibold" href="{% url 'view_cart' %}"><i class="bi bi-cart2 me-1"></i>Cart</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link fw-semibold" href="{% url 'my_store' %}"><i class="bi bi-shop me-1"></i>My Store</a>
                         </li>
                         <li class="nav-item">

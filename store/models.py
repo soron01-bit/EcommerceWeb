@@ -52,3 +52,29 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review by {self.user.username} for {self.product.name}"
+
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Cart of {self.user.username}"
+    
+    def get_total_price(self):
+        return sum(item.get_total_price() for item in self.items.all())
+    
+    def get_total_items(self):
+        return sum(item.quantity for item in self.items.all())
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1, blank=False, null=False)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.product.name} (x{self.quantity}) in {self.cart.user.username}'s cart"
+    
+    def get_total_price(self):
+        return self.product.price * self.quantity

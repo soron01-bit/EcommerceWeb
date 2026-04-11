@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Product, Review, Store, Cart, CartItem
-from .forms import CustomUserCreationForm, ReviewForm, StoreForm, ProductForm
+from .models import Product, Review, Store, Cart, CartItem, ProductImage
+from .forms import CustomUserCreationForm, ReviewForm, StoreForm, ProductForm, MultipleProductImagesForm
 
 def home(request):
     products = Product.objects.all()
@@ -94,14 +94,30 @@ def add_product(request):
         
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
+        
         if form.is_valid():
             product = form.save(commit=False)
             product.store = store
             product.save()
+            
+            # Handle multiple image uploads
+            if 'images' in request.FILES:
+                images = request.FILES.getlist('images')
+                for image_file in images:
+                    if image_file:
+                        ProductImage.objects.create(
+                            product=product,
+                            image=image_file
+                        )
+            
             messages.success(request, 'Product added successfully!')
             return redirect('my_store')
+        else:
+            # If form has errors, re-render with errors
+            return render(request, 'store/add_product.html', {'form': form})
     else:
         form = ProductForm()
+    
     return render(request, 'store/add_product.html', {'form': form})
 
 # Edit product view
@@ -111,15 +127,59 @@ def edit_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
     if product.store.owner != request.user:
         return HttpResponseForbidden("You are not allowed to edit this product.")
+    
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
+        
         if form.is_valid():
             form.save()
+            
+            # Handle multiple image uploads for editing
+            if 'images' in request.FILES:
+                images = request.FILES.getlist('images')
+                if images and any(img for img in images):  # Check if there are actual files
+                    # Add new images alongside existing ones
+                    for image_file in images:
+                        if image_file:
+                            ProductImage.objects.create(
+                                product=product,
+                                image=image_file
+                            )
+            
             messages.success(request, 'Product updated successfully!')
             return redirect('my_store')
+        else:
+            # If form is invalid, re-render with errors
+            product_images = product.images.all()
+            return render(request, 'store/edit_product.html', {
+                'form': form,
+                'product': product,
+                'product_images': product_images,
+            })
     else:
         form = ProductForm(instance=product)
-    return render(request, 'store/edit_product.html', {'form': form, 'product': product})
+    
+    # Get existing images
+    product_images = product.images.all()
+    
+    return render(request, 'store/edit_product.html', {
+        'form': form,
+        'product': product,
+        'product_images': product_images,
+    })
+
+@login_required
+def delete_product_image(request, image_id):
+    product_image = get_object_or_404(ProductImage, id=image_id)
+    product = product_image.product
+    
+    if product.store.owner != request.user:
+        return HttpResponseForbidden("You are not allowed to delete this image.")
+    
+    product_image.delete()
+    messages.success(request, 'Image deleted successfully!')
+    
+    return redirect('edit_product', pk=product.pk)
 
 @login_required
 def add_to_cart(request, pk):

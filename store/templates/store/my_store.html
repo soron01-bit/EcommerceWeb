@@ -22,8 +22,18 @@
         <div class="row row-cols-1 row-cols-md-2 g-4">
             {% for product in products %}
                 <div class="col">
-                    <div class="card h-100 product-card shadow-sm border-0">
-                        {% if product.image %}
+                    <div class="card h-100 product-card shadow-sm border-0 position-relative">
+                        {% if product.discount_percentage > 0 %}
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-danger p-2" style="font-size: 0.80rem;">
+                                <i class="bi bi-tag-fill me-1"></i>{{ product.discount_percentage }}% OFF
+                            </span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if product.images.all|length > 0 %}
+                            <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                        {% elif product.image %}
                             <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
                         {% else %}
                             <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
@@ -41,7 +51,19 @@
                                     <span class="badge bg-danger">Out</span>
                                 {% endif %}
                             </div>
-                            <p class="card-text text-success fw-bold fs-5">${{ product.price }}</p>
+                            
+                            <!-- Price Display with Discount -->
+                            {% if product.discount_percentage > 0 %}
+                            <div class="mb-2">
+                                <div class="d-flex gap-2 align-items-baseline">
+                                    <p class="text-success fw-bold fs-5 mb-0">₹{{ product.discounted_price }}</p>
+                                    <p class="text-muted text-decoration-line-through mb-0 small">₹{{ product.price }}</p>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p class="card-text text-success fw-bold fs-5">₹{{ product.price }}</p>
+                            {% endif %}
+                            
                             <div class="mt-auto">
                                 <a href="{% url 'product_detail' product.pk %}" class="btn btn-outline-primary btn-sm rounded-pill w-100 mb-2">View Details</a>
                                 <a href="{% url 'edit_product' product.pk %}" class="btn btn-outline-warning btn-sm rounded-pill w-100">Edit</a>

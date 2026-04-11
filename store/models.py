@@ -17,6 +17,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)
     stock = models.IntegerField(default=0)
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0, help_text='Discount percentage (0-100)')
 
     def __str__(self):
         return self.name
@@ -33,6 +34,24 @@ class Product(models.Model):
             return 'Low Stock'
         else:
             return 'Out of Stock'
+    
+    @property
+    def discounted_price(self):
+        if self.discount_percentage > 0:
+            discount_amount = self.price * (self.discount_percentage / 100)
+            return self.price - discount_amount
+        return self.price
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='product_images/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['uploaded_at']
+    
+    def __str__(self):
+        return f"Image for {self.product.name}"
 
 class ProductCertificate(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='certificate')
@@ -77,4 +96,5 @@ class CartItem(models.Model):
         return f"{self.product.name} (x{self.quantity}) in {self.cart.user.username}'s cart"
     
     def get_total_price(self):
-        return self.product.price * self.quantity
+        # Use discounted price if discount is available
+        return self.product.discounted_price * self.quantity

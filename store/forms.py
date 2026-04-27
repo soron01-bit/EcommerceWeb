@@ -1,12 +1,13 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Review, Store, Product, ProductImage
+from .models import Review, Store, Product, ProductImage, UserProfile, Order
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         fields = UserCreationForm.Meta.fields + ('email',)
+
 
 class ReviewForm(forms.ModelForm):
     class Meta:
@@ -66,3 +67,33 @@ class MultipleProductImagesForm(forms.Form):
     def clean(self):
         # Skip form validation for images since we're not validating the form itself
         return self.cleaned_data
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['phone_number', 'location', 'default_address']
+        widgets = {
+            'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your phone number'}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your city or area'}),
+            'default_address': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Enter your full delivery address'}),
+        }
+
+
+class BuyNowForm(forms.Form):
+    quantity = forms.IntegerField(min_value=1, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    location = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    address = forms.CharField(widget=forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}))
+    payment_method = forms.ChoiceField(
+        choices=Order.PAYMENT_METHOD_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
+
+
+class CartCheckoutForm(forms.Form):
+    location = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    address = forms.CharField(widget=forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}))
+    payment_method = forms.ChoiceField(
+        choices=Order.PAYMENT_METHOD_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )

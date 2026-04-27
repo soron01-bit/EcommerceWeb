@@ -123,7 +123,8 @@
                     </form>
                     <form action="{% url 'buy_product' product.pk %}" method="post" class="w-50">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-success btn-lg rounded-pill px-4 w-100 shadow"><i class="bi bi-lightning-charge me-2"></i>Buy Now</button>
+                        <input type="hidden" name="quantity" id="buyNowQuantityField" value="1">
+                        <button type="submit" class="btn btn-success btn-lg rounded-pill px-4 w-100 shadow" onclick="updateBuyNowQuantityField()"><i class="bi bi-lightning-charge me-2"></i>Buy Now</button>
                     </form>
                     {% else %}
                     <button type="button" class="btn btn-secondary btn-lg rounded-pill w-100 shadow" disabled><i class="bi bi-exclamation-circle me-2"></i>Out of Stock</button>
@@ -142,6 +143,10 @@
         <script>
             function updateQuantityField() {
                 document.getElementById('quantityField').value = document.getElementById('quantityInput').value;
+            }
+
+            function updateBuyNowQuantityField() {
+                document.getElementById('buyNowQuantityField').value = document.getElementById('quantityInput').value;
             }
         </script>
     </div>

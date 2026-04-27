@@ -8,7 +8,33 @@
     <p class="lead">Find the best products with verified certificates.</p>
 </div>
 
+<form method="get" action="{% url 'home' %}" class="row g-2 mb-4" role="search">
+    <div class="col-12 col-md-9">
+        <input
+            type="search"
+            name="q"
+            class="form-control form-control-lg"
+            placeholder="Search products, descriptions, or store names"
+            value="{{ query }}"
+            aria-label="Search products"
+        >
+    </div>
+    <div class="col-12 col-md-3 d-grid">
+        <button type="submit" class="btn btn-primary btn-lg">
+            <i class="bi bi-search me-1"></i>Search
+        </button>
+    </div>
+</form>
+
+{% if query %}
+<p class="text-muted">Showing results for "{{ query }}"</p>
+{% endif %}
+
+{% if query %}
+<h2 class="mb-4">Similar Products</h2>
+{% else %}
 <h2 class="mb-4">Featured Products</h2>
+{% endif %}
 <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for product in products %}
     <div class="col">
@@ -65,7 +91,11 @@
     </div>
     {% empty %}
     <div class="col-12 py-5 text-center">
+        {% if query %}
+        <h4 class="text-muted">No products matched your search.</h4>
+        {% else %}
         <h4 class="text-muted">No products available at the moment.</h4>
+        {% endif %}
     </div>
     {% endfor %}
 </div>

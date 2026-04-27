@@ -1,0 +1,31 @@
+{% extends 'store/base.html' %}
+
+{% block title %}My Profile - BCT E-Commerce{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="fw-bold mb-3"><i class="bi bi-geo-alt-fill text-primary me-2"></i>Location & Address</h3>
+                <p class="text-muted">Set your default location and address for faster checkout.</p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
+                        {{ form.location }}
+                    </div>
+                    <div class="mb-4">
+                        <label for="{{ form.default_address.id_for_label }}" class="form-label">Default Address</label>
+                        {{ form.default_address }}
+                    </div>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-save me-1"></i>Save Profile
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

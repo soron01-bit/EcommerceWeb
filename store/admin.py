@@ -1,28 +1,42 @@
 from django.contrib import admin
-from .models import Store, Product, ProductCertificate, Review, ProductImage
+from .models import Order
 
-class ProductImageInline(admin.TabularInline):
-    model = ProductImage
-    extra = 1
-    readonly_fields = ('uploaded_at',)
 
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'store', 'price', 'discount_percentage', 'stock', 'stock_status')
-    list_filter = ('store', 'price', 'discount_percentage')
-    search_fields = ('name', 'description')
-    readonly_fields = ('stock_status',)
-    inlines = [ProductImageInline]
-    fieldsets = (
-        ('Product Information', {
-            'fields': ('store', 'name', 'description', 'image')
-        }),
-        ('Pricing & Inventory', {
-            'fields': ('price', 'discount_percentage', 'stock', 'stock_status')
-        }),
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'user',
+        'product',
+        'quantity',
+        'total_price',
+        'location',
+        'payment_method',
+        'payment_status',
+        'status',
+        'created_at',
     )
+    list_filter = ('payment_method', 'payment_status', 'status', 'created_at')
+    search_fields = ('user__username', 'product__name', 'location', 'address')
+    readonly_fields = ('created_at',)
+    ordering = ('-created_at',)
+    list_select_related = ('user', 'product')
+    actions = ['cancel_orders']
 
-admin.site.register(Store)
-admin.site.register(Product, ProductAdmin)
-admin.site.register(ProductCertificate)
-admin.site.register(Review)
-admin.site.register(ProductImage)
+    @admin.action(description='Cancel selected orders and restore stock')
+    def cancel_orders(self, request, queryset):
+        cancelled_count = 0
+        for order in queryset:
+            if order.status == Order.STATUS_PENDING:
+                order.status = Order.STATUS_CANCELLED
+                order.save(update_fields=['status'])
+                
+                # Restore stock
+                order.product.stock += order.quantity
+                order.product.save(update_fields=['stock'])
+                cancelled_count += 1
+                
+        self.message_user(
+            request,
+            f'{cancelled_count} orders were successfully cancelled and stock restored.',
+        )

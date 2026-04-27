@@ -98,3 +98,72 @@ class CartItem(models.Model):
     def get_total_price(self):
         # Use discounted price if discount is available
         return self.product.discounted_price * self.quantity
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    phone_number = models.CharField(max_length=20, blank=True)
+    location = models.CharField(max_length=255, blank=True)
+    default_address = models.TextField(blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profile of {self.user.username}"
+
+
+class Order(models.Model):
+    PAYMENT_METHOD_COD = 'COD'
+    PAYMENT_METHOD_CARD = 'CARD'
+    PAYMENT_METHOD_UPI = 'UPI'
+    PAYMENT_METHOD_BANK = 'BANK'
+    PAYMENT_METHOD_CHOICES = [
+        (PAYMENT_METHOD_COD, 'Cash on Delivery'),
+        (PAYMENT_METHOD_CARD, 'Card'),
+        (PAYMENT_METHOD_UPI, 'UPI'),
+        (PAYMENT_METHOD_BANK, 'Bank Transfer'),
+    ]
+
+    PAYMENT_STATUS_PENDING = 'PENDING'
+    PAYMENT_STATUS_PAID = 'PAID'
+    PAYMENT_STATUS_FAILED = 'FAILED'
+    PAYMENT_STATUS_CHOICES = [
+        (PAYMENT_STATUS_PENDING, 'Pending'),
+        (PAYMENT_STATUS_PAID, 'Paid'),
+        (PAYMENT_STATUS_FAILED, 'Failed'),
+    ]
+
+    STATUS_PENDING = 'PENDING'
+    STATUS_SHIPPED = 'SHIPPED'
+    STATUS_DELIVERED = 'DELIVERED'
+    STATUS_CANCELLED = 'CANCELLED'
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_SHIPPED, 'Shipped'),
+        (STATUS_DELIVERED, 'Delivered'),
+        (STATUS_CANCELLED, 'Cancelled'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='orders')
+    quantity = models.PositiveIntegerField(default=1)
+    total_price = models.DecimalField(max_digits=12, decimal_places=2)
+    address = models.TextField()
+    location = models.CharField(max_length=255)
+    payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES)
+    payment_status = models.CharField(
+        max_length=10,
+        choices=PAYMENT_STATUS_CHOICES,
+        default=PAYMENT_STATUS_PENDING,
+    )
+    status = models.CharField(
+        max_length=15,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Order #{self.id} by {self.user.username} - {self.product.name}"

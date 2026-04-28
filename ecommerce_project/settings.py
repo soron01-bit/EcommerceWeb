@@ -1,3 +1,6 @@
+
+
+
 """
 Django settings for ecommerce_project project.
 
@@ -99,25 +102,18 @@ WSGI_APPLICATION = 'ecommerce_project.wsgi.application'
 #---new database system end here---
 #again
 import os
+from dotenv import load_dotenv
 import dj_database_url
 
-if os.environ.get("DATABASE_URL"):
-    # 👉 Render (Production)
-    DATABASES = {
-        'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
-    }
-else:
-    # 👉 Local (Laptop)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'ecommerce_db',
-            'USER': 'postgres',
-            'PASSWORD': 'sharan1234',
-            'HOST': 'localhost',
-            'PORT': '5432',
-        }
-    }
+load_dotenv()
+
+DATABASES = {
+    'default': dj_database_url.parse(
+        os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
 #again
 
 

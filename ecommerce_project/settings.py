@@ -76,12 +76,28 @@ WSGI_APPLICATION = 'ecommerce_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+#---old database system start here---
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+#---old database system end here---
+
+#---new database system start here---
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ecommerce_db',
+        'USER': 'postgres',
+        'PASSWORD': 'sharan1234',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+#---new database system end here---
+
 
 
 # Password validation

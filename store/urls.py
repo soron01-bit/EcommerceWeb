@@ -26,12 +26,7 @@ urlpatterns = [
     path('my-orders/', views.my_orders, name='my_orders'),
     path('order/<int:pk>/cancel/', views.cancel_order, name='cancel_order'),
     
-    # Store Management
-    path('my-store/', views.my_store, name='my_store'),
-    path('my-store/create/', views.create_store, name='create_store'),
-    path('my-store/add-product/', views.add_product, name='add_product'),
-    path('my-store/edit-product/<int:pk>/', views.edit_product, name='edit_product'),
-    path('my-store/delete-image/<int:image_id>/', views.delete_product_image, name='delete_product_image'),
+
     # Auth views
     path('register/', views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='store/login.html'), name='login'),

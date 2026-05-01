@@ -31,12 +31,13 @@ class StoreForm(forms.ModelForm):
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'discount_percentage', 'image', 'stock']
+        fields = ['name', 'description', 'price', 'discount_percentage', 'size_type', 'image', 'stock']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
             'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'discount_percentage': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
+            'size_type': forms.Select(attrs={'class': 'form-select'}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'stock': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
         }
@@ -82,12 +83,17 @@ class UserProfileForm(forms.ModelForm):
 
 class BuyNowForm(forms.Form):
     quantity = forms.IntegerField(min_value=1, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    size = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-select'}))
     location = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
     address = forms.CharField(widget=forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}))
     payment_method = forms.ChoiceField(
         choices=Order.PAYMENT_METHOD_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
     )
+
+    def __init__(self, *args, size_choices=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['size'].choices = size_choices or [('ONE_SIZE', 'One Size')]
 
 
 class CartCheckoutForm(forms.Form):

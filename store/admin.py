@@ -26,12 +26,12 @@ class StoreAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'name', 'store', 'price', 'discount_percentage',
+        'id', 'name', 'store', 'size_type', 'price', 'discount_percentage',
         'discounted_price_display', 'stock', 'stock_status',
     )
-    list_filter = ('store', 'discount_percentage')
+    list_filter = ('store', 'size_type', 'discount_percentage')
     search_fields = ('name', 'description', 'store__name')
-    list_editable = ('price', 'discount_percentage', 'stock')
+    list_editable = ('price', 'discount_percentage', 'stock', 'size_type')
     inlines = [ProductImageInline, ProductCertificateInline]
 
     @admin.display(description='Sale Price')
@@ -84,11 +84,11 @@ class UserProfileAdmin(admin.ModelAdmin):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'user', 'product', 'quantity', 'total_price',
+        'id', 'user', 'product', 'size', 'quantity', 'total_price',
         'location', 'payment_method', 'payment_status', 'status', 'created_at',
     )
-    list_filter = ('payment_method', 'payment_status', 'status', 'created_at')
-    search_fields = ('user__username', 'product__name', 'location', 'address')
+    list_filter = ('size', 'payment_method', 'payment_status', 'status', 'created_at')
+    search_fields = ('user__username', 'product__name', 'size', 'location', 'address')
     readonly_fields = ('created_at',)
     ordering = ('-created_at',)
     list_select_related = ('user', 'product')

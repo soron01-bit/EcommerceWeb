@@ -74,6 +74,24 @@ INTENT_TO_DOMAIN = {
     'vehicles': 'vehicles',
 }
 
+SHOE_SIZE_CHOICES = [(str(size), str(size)) for size in range(1, 11)]
+APPAREL_SIZE_CHOICES = [
+    ('S', 'S'),
+    ('M', 'M'),
+    ('L', 'L'),
+    ('XL', 'XL'),
+    ('XXL', 'XXL'),
+]
+DEFAULT_SIZE_CHOICES = [('ONE_SIZE', 'One Size')]
+SHOE_SIZE_KEYWORDS = {
+    'shoe', 'shoes', 'sneaker', 'sneakers', 'boot', 'boots', 'sandal', 'sandals',
+    'loafer', 'loafers', 'slipper', 'slippers', 'footwear',
+}
+APPAREL_SIZE_KEYWORDS = {
+    'shirt', 'tshirt', 't shirt', 'tee', 'pant', 'pants', 'trouser', 'trousers',
+    'jeans', 'jacket', 'hoodie', 'dress', 'top', 'kurta', 'skirt', 'shorts', 'sweater',
+}
+
 
 def normalize_text(value):
     # Normalize to lowercase ascii-like text and remove punctuation for robust matching.
@@ -105,6 +123,23 @@ def expand_query_tokens(tokens):
 
 def get_word_set(text):
     return {word for word in normalize_text(text).split() if word}
+
+
+def matches_any_keyword(text, keywords):
+    normalized_text = normalize_text(text)
+    return any(keyword in normalized_text for keyword in keywords)
+
+
+def get_product_size_choices(product):
+    size_type = getattr(product, 'size_type', Product.SIZE_TYPE_ONE_SIZE)
+
+    if size_type == Product.SIZE_TYPE_SHOE:
+        return SHOE_SIZE_CHOICES
+
+    if size_type == Product.SIZE_TYPE_APPAREL:
+        return APPAREL_SIZE_CHOICES
+
+    return DEFAULT_SIZE_CHOICES
 
 
 def levenshtein_distance(left, right):
@@ -476,6 +511,7 @@ def product_detail(request, pk):
 @login_required
 def buy_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
+    size_choices = get_product_size_choices(product)
 
     if product.stock <= 0:
         messages.error(request, 'This product is out of stock.')
@@ -490,12 +526,13 @@ def buy_product(request, pk):
 
     initial_data = {
         'quantity': initial_quantity,
+        'size': size_choices[0][0],
         'location': profile.location,
         'address': profile.default_address,
     }
 
     if request.method == 'POST' and request.POST.get('confirm_order') == '1':
-        form = BuyNowForm(request.POST)
+        form = BuyNowForm(request.POST, size_choices=size_choices)
         max_stock = product.stock
         form.fields['quantity'].max_value = max_stock
 
@@ -511,6 +548,7 @@ def buy_product(request, pk):
                 user=request.user,
                 product=product,
                 quantity=quantity,
+                size=form.cleaned_data['size'],
                 total_price=total_price,
                 address=form.cleaned_data['address'],
                 location=form.cleaned_data['location'],
@@ -528,12 +566,13 @@ def buy_product(request, pk):
             messages.success(request, f'Order placed for {product.name}. Admin can review it in the admin panel.')
             return redirect('home')
     else:
-        form = BuyNowForm(initial=initial_data)
+        form = BuyNowForm(initial=initial_data, size_choices=size_choices)
         form.fields['quantity'].max_value = product.stock
 
     return render(request, 'store/buy_now.html', {
         'product': product,
         'form': form,
+        'size_choices': size_choices,
     })
 
 

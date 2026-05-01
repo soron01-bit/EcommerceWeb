@@ -85,6 +85,7 @@
         </div>
         
         <p class="text-muted"><i class="bi bi-shop me-2"></i>Sold by: <strong>{{ product.store.name }}</strong></p>
+        <p class="text-muted mb-2"><i class="bi bi-rulers me-2"></i>Size options: <strong>{{ product.get_size_type_display }}</strong></p>
         
         {% if user.is_authenticated and user.store.id == product.store.id %}
         <div class="alert alert-info mt-3 mb-3 py-2">

@@ -11,6 +11,15 @@ class Store(models.Model):
         return self.name
 
 class Product(models.Model):
+    SIZE_TYPE_ONE_SIZE = 'ONE_SIZE'
+    SIZE_TYPE_SHOE = 'SHOE'
+    SIZE_TYPE_APPAREL = 'APPAREL'
+    SIZE_TYPE_CHOICES = [
+        (SIZE_TYPE_ONE_SIZE, 'One Size'),
+        (SIZE_TYPE_SHOE, 'Shoes (1-10)'),
+        (SIZE_TYPE_APPAREL, 'Apparel (S, M, L, XL, XXL)'),
+    ]
+
     store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name='products')
     name = models.CharField(max_length=200)
     description = models.TextField()
@@ -18,6 +27,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)
     stock = models.IntegerField(default=0)
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0, help_text='Discount percentage (0-100)')
+    size_type = models.CharField(max_length=20, choices=SIZE_TYPE_CHOICES, default=SIZE_TYPE_ONE_SIZE)
 
     def __str__(self):
         return self.name
@@ -146,6 +156,7 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='orders')
     quantity = models.PositiveIntegerField(default=1)
+    size = models.CharField(max_length=20, blank=True, null=True)
     total_price = models.DecimalField(max_digits=12, decimal_places=2)
     address = models.TextField()
     location = models.CharField(max_length=255)

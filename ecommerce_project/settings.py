@@ -112,13 +112,41 @@ import dj_database_url
 
 load_dotenv(override=True)
 
-DATABASES = {
-    'default': dj_database_url.parse(
-        os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
+DATABASES = None
+db_url = os.environ.get("DATABASE_URL")
+
+if db_url:
+    try:
+        import psycopg2
+        connection_params = dj_database_url.parse(db_url)
+        # Verify remote connection works with a brief timeout
+        conn = psycopg2.connect(
+            dbname=connection_params['NAME'],
+            user=connection_params['USER'],
+            password=connection_params['PASSWORD'],
+            host=connection_params['HOST'],
+            port=connection_params['PORT'],
+            connect_timeout=2
+        )
+        conn.close()
+        DATABASES = {
+            'default': dj_database_url.parse(
+                db_url,
+                conn_max_age=600,
+                ssl_require=True
+            )
+        }
+    except Exception as e:
+        print(f"\nWarning: Could not connect to remote PostgreSQL database ({e}).")
+        print("Falling back to local SQLite database.\n")
+
+if not DATABASES:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 #again
 
 

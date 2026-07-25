@@ -31,7 +31,7 @@ class StoreForm(forms.ModelForm):
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'discount_percentage', 'size_type', 'image', 'stock']
+        fields = ['name', 'description', 'price', 'discount_percentage', 'size_type', 'image', 'image_url', 'stock']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
@@ -39,6 +39,7 @@ class ProductForm(forms.ModelForm):
             'discount_percentage': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0', 'max': '100'}),
             'size_type': forms.Select(attrs={'class': 'form-select'}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'image_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Optional external product or image URL'}),
             'stock': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
         }
 

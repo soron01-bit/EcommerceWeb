@@ -25,12 +25,26 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    image_url = models.CharField(max_length=1000, blank=True, null=True, help_text='External image link or product link')
     stock = models.IntegerField(default=0)
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0, help_text='Discount percentage (0-100)')
     size_type = models.CharField(max_length=20, choices=SIZE_TYPE_CHOICES, default=SIZE_TYPE_ONE_SIZE)
 
     def __str__(self):
         return self.name
+    
+    @property
+    def display_image_url(self):
+        if self.image_url:
+            return self.image_url
+        if self.image:
+            try:
+                url = str(self.image.url)
+                if url:
+                    return url
+            except Exception:
+                pass
+        return ''
     
     @property
     def is_in_stock(self):

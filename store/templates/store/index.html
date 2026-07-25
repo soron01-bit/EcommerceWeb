@@ -48,14 +48,28 @@
             </div>
             {% endif %}
             
-            {% if product.images.all|length > 0 %}
-                <img src="{{ product.images.first.image.url }}" class="card-img-top p-3" alt="{{ product.name }}" style="object-fit: contain; height: 250px;">
-            {% elif product.image %}
-                <img src="{{ product.image.url }}" class="card-img-top p-3" alt="{{ product.name }}" style="object-fit: contain; height: 250px;">
+            {% if product.image_url %}
+                <a href="{{ product.image_url }}" target="_blank" rel="noopener noreferrer" title="View photo from web (Croma)">
+                    {% if product.images.all|length > 0 %}
+                        <img src="{{ product.images.first.image.url }}" class="card-img-top p-3" alt="{{ product.name }}" style="object-fit: contain; height: 250px;">
+                    {% elif product.display_image_url %}
+                        <img src="{{ product.display_image_url }}" class="card-img-top p-3" alt="{{ product.name }}" style="object-fit: contain; height: 250px;">
+                    {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                            <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+                        </div>
+                    {% endif %}
+                </a>
             {% else %}
-                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
-                    <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
-                </div>
+                {% if product.images.all|length > 0 %}
+                    <img src="{{ product.images.first.image.url }}" class="card-img-top p-3" alt="{{ product.name }}" style="object-fit: contain; height: 250px;">
+                {% elif product.display_image_url %}
+                    <img src="{{ product.display_image_url }}" class="card-img-top p-3" alt="{{ product.name }}" style="object-fit: contain; height: 250px;">
+                {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                        <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+                    </div>
+                {% endif %}
             {% endif %}
             <div class="card-body">
                 <div class="d-flex align-items-center justify-content-between gap-2 mb-2">

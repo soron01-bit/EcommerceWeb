@@ -1,46 +1,66 @@
 {% extends 'store/base.html' %}
 
-{% block title %}Add Product - BCT E-Commerce{% endblock %}
+{% block title %}Add Product - Online Mart Seller Hub{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow-sm border-0 rounded-4">
-            <div class="card-body p-4 p-md-5">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3 class="card-title text-primary fw-bold mb-0"><i class="bi bi-box me-2"></i>Add New Product</h3>
-                    <a href="{% url 'my_store' %}" class="btn btn-outline-secondary btn-sm rounded-pill"><i class="bi bi-arrow-left me-1"></i>Back to Store</a>
+<div class="row justify-content-center my-3">
+    <div class="col-lg-9">
+        <div class="fk-card p-4">
+            <h5 class="fw-bold mb-4 pb-2 border-bottom text-primary d-flex align-items-center">
+                <i class="bi bi-plus-square-fill text-primary me-2"></i>Add New Product Listing
+            </h5>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="{{ form.name.id_for_label }}" class="form-label small fw-semibold">Product Title / Name</label>
+                    {{ form.name }}
                 </div>
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {% for field in form %}
-                        <div class="mb-3">
-                            <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.help_text %}
-                                <small class="form-text text-muted d-block mt-1">{{ field.help_text|safe }}</small>
-                            {% endif %}
-                            {% if field.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in field.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    
-                    <!-- Multiple Images Upload Section -->
-                    <div class="mb-3 mt-4 pt-3 border-top">
-                        <h5 class="text-secondary fw-semibold mb-3"><i class="bi bi-images me-2"></i>Add Product Images</h5>
-                        <label for="productImages" class="form-label fw-semibold">Product Images (Optional)</label>
-                        <input type="file" id="productImages" name="images" class="form-control" accept="image/*" multiple>
-                        <small class="form-text text-muted d-block mt-2">You can upload multiple images. Hold Ctrl (Cmd on Mac) to select multiple. Supported formats: JPG, PNG, AVIF, etc.</small>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label for="{{ form.price.id_for_label }}" class="form-label small fw-semibold">Original Price (₹)</label>
+                        {{ form.price }}
                     </div>
-                    
-                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 mt-3 fw-bold">Add Product</button>
-                </form>
-            </div>
+                    <div class="col-md-4">
+                        <label for="{{ form.discount_percentage.id_for_label }}" class="form-label small fw-semibold">Discount Percentage (%)</label>
+                        {{ form.discount_percentage }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="{{ form.stock.id_for_label }}" class="form-label small fw-semibold">Available Stock</label>
+                        {{ form.stock }}
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="{{ form.size_type.id_for_label }}" class="form-label small fw-semibold">Category / Size Option</label>
+                        {{ form.size_type }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.image_url.id_for_label }}" class="form-label small fw-semibold">Web Photo URL (Optional)</label>
+                        {{ form.image_url }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.description.id_for_label }}" class="form-label small fw-semibold">Product Description</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_image_files" class="form-label small fw-semibold">Upload Product Images</label>
+                    <input type="file" name="image_files" id="id_image_files" class="form-control" multiple accept="image/*">
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                    <a href="{% url 'my_store' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back to Seller Hub</a>
+                    <button type="submit" class="btn btn-fk-yellow px-5 py-2 fw-bold text-uppercase shadow-sm">
+                        Publish Product
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

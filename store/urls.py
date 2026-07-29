@@ -14,6 +14,7 @@ urlpatterns = [
     path('product/<int:pk>/', views.product_detail, name='product_detail'),
     path('buy/<int:pk>/', views.buy_product, name='buy_product'),
     path('profile/', views.user_profile, name='user_profile'),
+    path('user-profile/', views.user_profile, name='profile'),
     
     # Cart URLs
     path('cart/', views.view_cart, name='view_cart'),
@@ -25,10 +26,18 @@ urlpatterns = [
     # Order URLs
     path('my-orders/', views.my_orders, name='my_orders'),
     path('order/<int:pk>/cancel/', views.cancel_order, name='cancel_order'),
-    
+
+    # Seller Hub Store URLs
+    path('store/create/', views.create_store, name='create_store'),
+    path('store/my-store/', views.my_store, name='my_store'),
+    path('store/product/add/', views.add_product, name='add_product'),
+    path('store/product/<int:pk>/edit/', views.edit_product, name='edit_product'),
+    path('store/product/<int:pk>/delete/', views.delete_product, name='delete_product'),
+    path('store/image/<int:image_id>/delete/', views.delete_product_image, name='delete_product_image'),
 
     # Auth views
     path('register/', views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='store/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
 ]
+

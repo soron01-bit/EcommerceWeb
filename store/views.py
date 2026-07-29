@@ -1,6 +1,6 @@
 from decimal import Decimal
-from django.contrib.auth import login as auth_login
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login as auth_login, update_session_auth_hash
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -14,7 +14,12 @@ from .forms import (
     UserProfileForm,
     BuyNowForm,
     CartCheckoutForm,
+    StoreForm,
+    ProductForm,
+    ProductImageForm,
+    MultipleProductImagesForm,
 )
+
 
 
 SEARCH_SYNONYMS = {
@@ -596,15 +601,37 @@ def user_profile(request):
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=profile)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Location and address updated successfully.')
-            return redirect('user_profile')
+        if 'change_password' in request.POST:
+            password_form = PasswordChangeForm(user=request.user, data=request.POST)
+            form = UserProfileForm(instance=profile)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Your password has been changed successfully!')
+                return redirect('user_profile')
+            else:
+                messages.error(request, 'Please correct the errors in the password change form below.')
+        else:
+            form = UserProfileForm(request.POST, instance=profile)
+            password_form = PasswordChangeForm(user=request.user)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Profile details updated successfully.')
+                return redirect('user_profile')
     else:
         form = UserProfileForm(instance=profile)
+        password_form = PasswordChangeForm(user=request.user)
 
-    return render(request, 'store/profile.html', {'form': form})
+    orders_count = request.user.orders.count()
+
+    return render(request, 'store/profile.html', {
+        'form': form,
+        'password_form': password_form,
+        'profile': profile,
+        'orders_count': orders_count,
+    })
+
+
 
 
 
@@ -765,3 +792,118 @@ def cancel_order(request, pk):
         return redirect(request.META.get('HTTP_REFERER', 'home'))
     
     return redirect('my_orders')
+
+
+@login_required
+def create_store(request):
+    if hasattr(request.user, 'store'):
+        return redirect('my_store')
+
+    if request.method == 'POST':
+        form = StoreForm(request.POST)
+        if form.is_valid():
+            store = form.save(commit=False)
+            store.owner = request.user
+            store.save()
+            messages.success(request, f'Store "{store.name}" registered successfully!')
+            return redirect('my_store')
+    else:
+        form = StoreForm()
+
+    return render(request, 'store/create_store.html', {'form': form})
+
+
+@login_required
+def my_store(request):
+    if not hasattr(request.user, 'store'):
+        return redirect('create_store')
+
+    store = request.user.store
+    products = store.products.all()
+    return render(request, 'store/my_store.html', {
+        'store': store,
+        'products': products,
+    })
+
+
+@login_required
+def add_product(request):
+    if not hasattr(request.user, 'store'):
+        messages.error(request, 'You must create a store first before adding products.')
+        return redirect('create_store')
+
+    store = request.user.store
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        image_form = MultipleProductImagesForm(request.POST, request.FILES)
+        if form.is_valid():
+            product = form.save(commit=False)
+            product.store = store
+            product.save()
+
+            files = request.FILES.getlist('images')
+            for f in files:
+                ProductImage.objects.create(product=product, image=f)
+
+            messages.success(request, f'Product "{product.name}" added successfully!')
+            return redirect('my_store')
+    else:
+        form = ProductForm()
+        image_form = MultipleProductImagesForm()
+
+    return render(request, 'store/add_product.html', {
+        'form': form,
+        'image_form': image_form,
+    })
+
+
+@login_required
+def edit_product(request, pk):
+    if not hasattr(request.user, 'store'):
+        return redirect('create_store')
+
+    product = get_object_or_404(Product, pk=pk, store=request.user.store)
+
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        image_form = MultipleProductImagesForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+
+            files = request.FILES.getlist('images')
+            for f in files:
+                ProductImage.objects.create(product=product, image=f)
+
+            messages.success(request, f'Product "{product.name}" updated successfully!')
+            return redirect('my_store')
+    else:
+        form = ProductForm(instance=product)
+        image_form = MultipleProductImagesForm()
+
+    return render(request, 'store/edit_product.html', {
+        'form': form,
+        'image_form': image_form,
+        'product': product,
+    })
+
+
+@login_required
+def delete_product(request, pk):
+    if not hasattr(request.user, 'store'):
+        return redirect('create_store')
+
+    product = get_object_or_404(Product, pk=pk, store=request.user.store)
+    product_name = product.name
+    product.delete()
+    messages.success(request, f'Product "{product_name}" has been deleted.')
+    return redirect('my_store')
+
+
+@login_required
+def delete_product_image(request, image_id):
+    image = get_object_or_404(ProductImage, id=image_id, product__store__owner=request.user)
+    product_pk = image.product.pk
+    image.delete()
+    messages.success(request, 'Image removed.')
+    return redirect('edit_product', pk=product_pk)
+

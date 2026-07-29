@@ -35,8 +35,8 @@ class Product(models.Model):
     
     @property
     def display_image_url(self):
-        if self.image_url:
-            return self.image_url
+        if self.image_url and self.image_url.strip():
+            return self.image_url.strip()
         if self.image:
             try:
                 url = str(self.image.url)
@@ -45,6 +45,7 @@ class Product(models.Model):
             except Exception:
                 pass
         return ''
+
     
     @property
     def is_in_stock(self):

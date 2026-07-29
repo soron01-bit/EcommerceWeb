@@ -1,116 +1,183 @@
 {% extends 'store/base.html' %}
 
-{% block title %}Home - BCT E-Commerce{% endblock %}
+{% block title %}Online Mart - India's Best Online Shopping Site{% endblock %}
 
 {% block content %}
-<div class="jumbotron text-center">
-    <h1 class="display-4 fw-bold">Welcome to BCT Store</h1>
-    <p class="lead">Find the best products with verified certificates.</p>
-</div>
-
-<form method="get" action="{% url 'home' %}" class="row g-2 mb-4" role="search">
-    <div class="col-12 col-md-9">
-        <input
-            type="search"
-            name="q"
-            class="form-control form-control-lg"
-            placeholder="Search products, descriptions, or store names"
-            value="{{ query }}"
-            aria-label="Search products"
-        >
+<!-- Flipkart Hero Banner Carousel -->
+<div id="fkHeroCarousel" class="carousel slide mb-4 fk-card overflow-hidden shadow-sm border-0" data-bs-ride="carousel" data-bs-interval="4000">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#fkHeroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#fkHeroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#fkHeroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
     </div>
-    <div class="col-12 col-md-3 d-grid">
-        <button type="submit" class="btn btn-primary btn-lg">
-            <i class="bi bi-search me-1"></i>Search
-        </button>
-    </div>
-</form>
-
-{% if query %}
-<p class="text-muted">Showing results for "{{ query }}"</p>
-{% endif %}
-
-{% if query %}
-<h2 class="mb-4">Similar Products</h2>
-{% else %}
-<h2 class="mb-4">Featured Products</h2>
-{% endif %}
-<div class="row row-cols-1 row-cols-md-3 g-4">
-    {% for product in products %}
-    <div class="col">
-        <div class="card h-100 product-card position-relative">
-            <!-- Discount Badge -->
-            {% if product.discount_percentage > 0 %}
-            <div class="position-absolute top-0 end-0 m-3">
-                <span class="badge bg-danger p-2" style="font-size: 0.85rem;">
-                    <i class="bi bi-tag-fill me-1"></i>{{ product.discount_percentage }}% OFF
-                </span>
+    <div class="carousel-inner">
+        <!-- Banner 1: Big Billion Days / Mega Sale -->
+        <div class="carousel-item active">
+            <div class="p-4 p-md-5 text-white d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #047bd5 0%, #2874f0 60%, #172337 100%); min-height: 220px;">
+                <div>
+                    <span class="badge bg-warning text-dark px-3 py-2 fw-bold text-uppercase mb-2"><i class="bi bi-lightning-charge-fill me-1"></i>Big Savings Event</span>
+                    <h1 class="fw-bold mb-1 display-6">Mega Electronics & Deals</h1>
+                    <p class="lead mb-3">Up to 80% Off on Top Electronics, Laptops & Smart Devices</p>
+                    <a href="#featured-products" class="btn btn-fk-yellow shadow">Shop Deals Now</a>
+                </div>
+                <div class="d-none d-md-block text-end">
+                    <i class="bi bi-laptop-fill" style="font-size: 7rem; opacity: 0.85; color: #ffe500;"></i>
+                </div>
             </div>
-            {% endif %}
-            
-            {% if product.image_url %}
-                <a href="{{ product.image_url }}" target="_blank" rel="noopener noreferrer" title="View photo from web (Croma)">
-                    {% if product.images.all|length > 0 %}
-                        <img src="{{ product.images.first.image.url }}" class="card-img-top p-3" alt="{{ product.name }}" style="object-fit: contain; height: 250px;">
-                    {% elif product.display_image_url %}
-                        <img src="{{ product.display_image_url }}" class="card-img-top p-3" alt="{{ product.name }}" style="object-fit: contain; height: 250px;">
-                    {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
-                            <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
-                        </div>
-                    {% endif %}
-                </a>
-            {% else %}
-                {% if product.images.all|length > 0 %}
-                    <img src="{{ product.images.first.image.url }}" class="card-img-top p-3" alt="{{ product.name }}" style="object-fit: contain; height: 250px;">
-                {% elif product.display_image_url %}
-                    <img src="{{ product.display_image_url }}" class="card-img-top p-3" alt="{{ product.name }}" style="object-fit: contain; height: 250px;">
-                {% else %}
-                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
-                        <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
-                    </div>
-                {% endif %}
-            {% endif %}
-            <div class="card-body">
-                <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
-                    <h5 class="card-title fw-bold mb-0">{{ product.name }}</h5>
-                    {% if product.stock > 10 %}
-                        <span class="badge bg-success">In Stock</span>
-                    {% elif product.stock > 0 %}
-                        <span class="badge bg-warning text-dark">Low</span>
-                    {% else %}
-                        <span class="badge bg-danger">Out</span>
-                    {% endif %}
+        </div>
+        <!-- Banner 2: Fashion & Apparel -->
+        <div class="carousel-item">
+            <div class="p-4 p-md-5 text-white d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #e52d27 0%, #b31217 100%); min-height: 220px;">
+                <div>
+                    <span class="badge bg-light text-danger px-3 py-2 fw-bold text-uppercase mb-2"><i class="bi bi-bag-heart-fill me-1"></i>Fashion Fiesta</span>
+                    <h1 class="fw-bold mb-1 display-6">Trending Styles & Apparel</h1>
+                    <p class="lead mb-3">Min 50% - 70% Off on Premium Brands & Footwear</p>
+                    <a href="#featured-products" class="btn btn-warning text-dark fw-bold px-4 py-2 shadow">Explore Fashion</a>
                 </div>
-                
-                <!-- Price Display with Discount -->
-                {% if product.discount_percentage > 0 %}
-                <div class="mb-2">
-                    <div class="d-flex gap-2 align-items-baseline">
-                        <p class="text-success fw-bold fs-5 mb-0">₹{{ product.discounted_price }}</p>
-                        <p class="text-muted text-decoration-line-through mb-0 small">₹{{ product.price }}</p>
-                    </div>
+                <div class="d-none d-md-block text-end">
+                    <i class="bi bi-handbag-fill" style="font-size: 7rem; opacity: 0.85; color: #ffffff;"></i>
                 </div>
-                {% else %}
-                <p class="text-success fw-bold fs-5">₹{{ product.price }}</p>
-                {% endif %}
-                
-                <p class="card-text text-muted small">{{ product.description|truncatewords:15 }}</p>
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <a href="{% url 'product_detail' product.pk %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">View Details</a>
-                    <span class="badge bg-secondary"><i class="bi bi-shop me-1"></i>{{ product.store.name }}</span>
+            </div>
+        </div>
+        <!-- Banner 3: Home & Appliances -->
+        <div class="carousel-item">
+            <div class="p-4 p-md-5 text-white d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); min-height: 220px;">
+                <div>
+                    <span class="badge bg-dark text-warning px-3 py-2 fw-bold text-uppercase mb-2"><i class="bi bi-shield-check me-1"></i>Mart Assured Quality</span>
+                    <h1 class="fw-bold mb-1 display-6 text-dark">Home & Kitchen Essentials</h1>
+                    <p class="lead mb-3 text-dark fw-medium">Best Price Guaranteed with Fast Free Delivery</p>
+                    <a href="#featured-products" class="btn btn-dark text-white fw-bold px-4 py-2 shadow">Browse Collection</a>
+                </div>
+                <div class="d-none d-md-block text-end">
+                    <i class="bi bi-house-door-fill text-dark" style="font-size: 7rem; opacity: 0.85;"></i>
                 </div>
             </div>
         </div>
     </div>
-    {% empty %}
-    <div class="col-12 py-5 text-center">
+    <button class="carousel-control-prev" type="button" data-bs-target="#fkHeroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#fkHeroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+<!-- Main Storefront Section Container -->
+<div class="fk-card p-4 mb-4" id="featured-products">
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <div>
+            {% if query %}
+            <h4 class="fw-bold mb-0">Search Results for "<span class="text-primary">{{ query }}</span>"</h4>
+            <p class="text-muted small mb-0">Found matching products in Online Mart</p>
+            {% else %}
+            <h4 class="fw-bold mb-0">Deal of the Day & Top Offers</h4>
+            <p class="text-muted small mb-0">Handpicked offers guaranteed at lowest prices</p>
+            {% endif %}
+        </div>
         {% if query %}
-        <h4 class="text-muted">No products matched your search.</h4>
+        <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary rounded-1"><i class="bi bi-x-circle me-1"></i>Clear Filter</a>
         {% else %}
-        <h4 class="text-muted">No products available at the moment.</h4>
+        <span class="badge bg-primary px-3 py-2">Mart Assured ✦</span>
         {% endif %}
     </div>
-    {% endfor %}
+
+    <!-- Product Grid -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+        {% for product in products %}
+        <div class="col">
+            <div class="fk-card h-100 p-3 d-flex flex-column justify-content-between position-relative">
+                <!-- Wishlist Heart Button -->
+                <button class="btn btn-sm btn-light border-0 rounded-circle position-absolute top-0 end-0 m-2 shadow-sm text-muted" title="Add to Wishlist">
+                    <i class="bi bi-heart"></i>
+                </button>
+
+                <!-- Discount Tag Badge -->
+                {% if product.discount_percentage > 0 %}
+                <div class="position-absolute top-0 start-0 m-2">
+                    <span class="badge bg-danger fw-bold" style="font-size: 0.75rem;">
+                        {{ product.discount_percentage|stringformat:".0f" }}% OFF
+                    </span>
+                </div>
+                {% endif %}
+
+                <!-- Product Image Container -->
+                <div class="text-center py-2 mb-2" style="height: 180px; display: flex; align-items: center; justify-content: center; background-color: #fff;">
+                    <a href="{% url 'product_detail' product.pk %}" class="d-block w-100 text-center">
+                        {% if product.images.all|length > 0 %}
+                        <img src="{{ product.images.first.image.url }}" class="img-fluid rounded" alt="{{ product.name }}" style="max-height: 170px; max-width: 100%; object-fit: contain;">
+                        {% elif product.display_image_url %}
+                        <img src="{{ product.display_image_url }}" class="img-fluid rounded" alt="{{ product.name }}" style="max-height: 170px; max-width: 100%; object-fit: contain;">
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center w-100 rounded" style="height: 170px;">
+                            <i class="bi bi-box-seam text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+                    </a>
+                </div>
+
+                <!-- Product Details -->
+                <div class="flex-grow-1 d-flex flex-column justify-content-between">
+                    <div>
+                        <!-- Product Title -->
+                        <h6 class="fw-bold mb-1 text-truncate" title="{{ product.name }}">
+                            <a href="{% url 'product_detail' product.pk %}" class="text-decoration-none text-dark">
+                                {{ product.name }}
+                            </a>
+                        </h6>
+
+                        <!-- Rating & Assured Badge -->
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="fk-rating-badge">
+                                4.3 <i class="bi bi-star-fill" style="font-size: 0.65rem;"></i>
+                            </span>
+                            <span class="text-muted small">(1,248)</span>
+                            <span class="fk-assured-badge ms-auto">Mart<span>Assured</span></span>
+                        </div>
+
+                        <!-- Pricing Info -->
+                        <div class="mb-2">
+                            {% if product.discount_percentage > 0 %}
+                            <div class="d-flex align-items-baseline gap-2 flex-wrap">
+                                <span class="fw-bold fs-5 text-dark">₹{{ product.discounted_price|stringformat:".2f" }}</span>
+                                <span class="text-muted text-decoration-line-through small">₹{{ product.price }}</span>
+                            </div>
+                            {% else %}
+                            <span class="fw-bold fs-5 text-dark">₹{{ product.price }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Free Delivery Tag -->
+                        <div class="mb-3">
+                            <small class="text-success fw-semibold" style="font-size: 0.8rem;"><i class="bi bi-truck me-1"></i>Free Delivery</small>
+                            <small class="text-muted d-block text-truncate" style="font-size: 0.75rem;"><i class="bi bi-shop me-1"></i>Seller: {{ product.store.name }}</small>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="mt-2 pt-2 border-top">
+                        <a href="{% url 'product_detail' product.pk %}" class="btn btn-sm btn-outline-primary w-100 fw-semibold rounded-1">
+                            <i class="bi bi-eye me-1"></i>View Product
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 py-5 text-center">
+            <i class="bi bi-search text-muted mb-3" style="font-size: 4rem;"></i>
+            {% if query %}
+            <h5 class="text-muted fw-bold">No products matched your query "{{ query }}"</h5>
+            <p class="text-muted small">Try searching for other categories or brand names.</p>
+            <a href="{% url 'home' %}" class="btn btn-primary btn-sm rounded-1 mt-2">View All Products</a>
+            {% else %}
+            <h5 class="text-muted fw-bold">No products currently available in Online Mart</h5>
+            <p class="text-muted small">Please check back soon for exciting deals!</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
+

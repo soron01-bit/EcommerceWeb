@@ -1,55 +1,88 @@
 {% extends 'store/base.html' %}
 
-{% block title %}Checkout Cart - BCT E-Commerce{% endblock %}
+{% block title %}Checkout - Online Mart{% endblock %}
 
 {% block content %}
-<div class="row my-4 g-4">
-    <div class="col-lg-7">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <h4 class="fw-bold mb-3"><i class="bi bi-credit-card-2-front-fill text-success me-2"></i>Checkout</h4>
-                <form method="post">
-                    {% csrf_token %}
+<div class="row g-4 my-2">
+    <!-- Left Column: Checkout Stepper Form -->
+    <div class="col-lg-8">
+        <div class="fk-card p-4">
+            <h5 class="fw-bold mb-4 text-primary pb-2 border-bottom">
+                <i class="bi bi-shield-lock-fill me-2 text-primary"></i>Online Mart Checkout
+            </h5>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Step 1: Delivery Address & Location -->
+                <div class="mb-4 p-3 bg-light rounded border">
+                    <h6 class="fw-bold mb-3 text-dark d-flex align-items-center">
+                        <span class="badge bg-primary text-white me-2" style="font-size: 0.8rem;">1</span> Delivery Location & Address
+                    </h6>
                     <div class="mb-3">
-                        <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
+                        <label for="{{ form.location.id_for_label }}" class="form-label small fw-semibold">City / Location</label>
                         {{ form.location }}
                     </div>
-                    <div class="mb-3">
-                        <label for="{{ form.address.id_for_label }}" class="form-label">Delivery Address</label>
+                    <div>
+                        <label for="{{ form.address.id_for_label }}" class="form-label small fw-semibold">Detailed Street Address</label>
                         {{ form.address }}
                     </div>
-                    <div class="mb-4">
-                        <label for="{{ form.payment_method.id_for_label }}" class="form-label">Payment Method</label>
+                </div>
+
+                <!-- Step 2: Payment Method -->
+                <div class="mb-4 p-3 bg-light rounded border">
+                    <h6 class="fw-bold mb-3 text-dark d-flex align-items-center">
+                        <span class="badge bg-primary text-white me-2" style="font-size: 0.8rem;">2</span> Payment Options
+                    </h6>
+                    <div>
+                        <label for="{{ form.payment_method.id_for_label }}" class="form-label small fw-semibold">Select Payment Mode</label>
                         {{ form.payment_method }}
                     </div>
-                    <button type="submit" class="btn btn-success rounded-pill px-4">
-                        <i class="bi bi-bag-check-fill me-1"></i>Place Cart Order
+                </div>
+
+                <!-- Place Order CTA Button -->
+                <div class="d-flex align-items-center justify-content-between pt-2">
+                    <a href="{% url 'view_cart' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back to Cart</a>
+                    <button type="submit" class="btn btn-fk-orange px-5 py-3 text-uppercase fw-bold shadow">
+                        <i class="bi bi-bag-check-fill me-2"></i>Confirm & Place Order
                     </button>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 
-    <div class="col-lg-5">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <h5 class="fw-bold mb-3">Order Items</h5>
-                {% for item in cart_items %}
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <div>
-                        <div class="fw-semibold">{{ item.product.name }}</div>
-                        <small class="text-muted">Qty: {{ item.quantity }}</small>
-                    </div>
-                    <div class="fw-semibold">₹{{ item.get_total_price }}</div>
+    <!-- Right Column: Order Items Summary & Total -->
+    <div class="col-lg-4">
+        <div class="fk-card p-3 sticky-top" style="top: 80px;">
+            <h6 class="text-muted fw-bold text-uppercase pb-2 border-bottom mb-3" style="letter-spacing: 0.5px;">Order Summary</h6>
+            
+            {% for item in cart_items %}
+            <div class="d-flex justify-content-between align-items-start mb-3 pb-2 border-bottom">
+                <div>
+                    <h6 class="fw-bold mb-0 text-truncate" style="max-width: 180px;">{{ item.product.name }}</h6>
+                    <small class="text-muted">Qty: {{ item.quantity }} × ₹{{ item.product.discounted_price|stringformat:".2f" }}</small>
                 </div>
-                {% endfor %}
-                <hr>
-                <div class="d-flex justify-content-between fs-5 fw-bold">
-                    <span>Total</span>
-                    <span>₹{{ total_price }}</span>
-                </div>
+                <div class="fw-bold text-dark">₹{{ item.get_total_price|stringformat:".2f" }}</div>
+            </div>
+            {% endfor %}
+
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Subtotal</span>
+                <span>₹{{ total_price|stringformat:".2f" }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Delivery</span>
+                <span class="text-success fw-bold">FREE</span>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between align-items-center py-2">
+                <h6 class="fw-bold mb-0">Total Payable</h6>
+                <h5 class="fw-bold text-dark mb-0">₹{{ total_price|stringformat:".2f" }}</h5>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
+

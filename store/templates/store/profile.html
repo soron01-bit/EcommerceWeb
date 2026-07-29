@@ -1,30 +1,159 @@
 {% extends 'store/base.html' %}
 
-{% block title %}My Profile - BCT E-Commerce{% endblock %}
+{% block title %}My Profile - Online Mart{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-4">
-    <div class="col-lg-8">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <h3 class="fw-bold mb-3"><i class="bi bi-geo-alt-fill text-primary me-2"></i>Location & Address</h3>
-                <p class="text-muted">Set your default location and address for faster checkout.</p>
-
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
-                        {{ form.location }}
-                    </div>
-                    <div class="mb-4">
-                        <label for="{{ form.default_address.id_for_label }}" class="form-label">Default Address</label>
-                        {{ form.default_address }}
-                    </div>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4">
-                        <i class="bi bi-save me-1"></i>Save Profile
-                    </button>
-                </form>
+<div class="row g-4 my-2">
+    <!-- Left Navigation Sidebar -->
+    <div class="col-md-4 col-lg-3">
+        <!-- User Identity Header Card -->
+        <div class="fk-card p-3 mb-3 d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-4 shadow-sm" style="width: 54px; height: 54px;">
+                {{ user.username|slice:":1"|upper }}
             </div>
+            <div class="overflow-hidden">
+                <small class="text-muted d-block">Hello,</small>
+                <h6 class="fw-bold mb-0 text-dark text-truncate">{{ user.first_name|default:user.username }}</h6>
+                <small class="text-primary fw-semibold" style="font-size: 0.75rem;"><i class="bi bi-shield-check me-1"></i>Verified Mart Account</small>
+            </div>
+        </div>
+
+        <!-- Navigation Menu -->
+        <div class="fk-card p-0 overflow-hidden">
+            <div class="list-group list-group-flush small">
+                <a href="{% url 'my_orders' %}" class="list-group-item list-group-item-action py-3 fw-bold d-flex align-items-center justify-content-between">
+                    <span><i class="bi bi-box-seam text-primary me-3 fs-5"></i>MY ORDERS</span>
+                    <span class="badge bg-primary rounded-pill">{{ orders_count|default:"0" }}</span>
+                </a>
+                <div class="list-group-item bg-light text-muted fw-bold py-2 text-uppercase" style="font-size: 0.75rem;">
+                    ACCOUNT SETTINGS
+                </div>
+                <a href="{% url 'user_profile' %}" class="list-group-item list-group-item-action py-3 active fw-semibold">
+                    <i class="bi bi-person me-3"></i>Profile Information
+                </a>
+                {% if user.store %}
+                <a href="{% url 'my_store' %}" class="list-group-item list-group-item-action py-3 fw-semibold">
+                    <i class="bi bi-shop text-success me-3"></i>Seller Dashboard ({{ user.store.name }})
+                </a>
+                {% else %}
+                <a href="{% url 'create_store' %}" class="list-group-item list-group-item-action py-3 fw-semibold text-primary">
+                    <i class="bi bi-shop me-3"></i>Become a Seller on Online Mart
+                </a>
+                {% endif %}
+                <a href="{% url 'view_cart' %}" class="list-group-item list-group-item-action py-3 fw-semibold">
+                    <i class="bi bi-cart me-3 text-warning"></i>My Saved Cart
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Full Profile Information Card -->
+    <div class="col-md-8 col-lg-9">
+        <!-- Profile Account Info Card -->
+        <div class="fk-card p-4 mb-4">
+            <div class="d-flex align-items-center justify-content-between pb-3 border-bottom mb-4">
+                <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-person-lines-fill text-primary me-2"></i>Personal Profile Information</h5>
+                <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i>Active Member</span>
+            </div>
+
+            <!-- Read-only Account Identity Grid -->
+            <div class="row g-3 mb-4 p-3 bg-light rounded border">
+                <div class="col-md-4">
+                    <small class="text-muted d-block fw-semibold mb-1">Account Username</small>
+                    <strong class="text-dark fs-6">{{ user.username }}</strong>
+                </div>
+                <div class="col-md-4">
+                    <small class="text-muted d-block fw-semibold mb-1">Email Address</small>
+                    <strong class="text-dark fs-6">{{ user.email|default:"Not specified" }}</strong>
+                </div>
+                <div class="col-md-4">
+                    <small class="text-muted d-block fw-semibold mb-1">Date Joined</small>
+                    <strong class="text-dark fs-6">{{ user.date_joined|date:"M d, Y" }}</strong>
+                </div>
+            </div>
+
+            <!-- Editable Profile Details Form -->
+            <form method="post">
+                {% csrf_token %}
+                <h6 class="fw-bold mb-3 text-secondary text-uppercase" style="font-size: 0.85rem; letter-spacing: 0.5px;">Contact & Delivery Details</h6>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="{{ form.phone_number.id_for_label }}" class="form-label small fw-semibold text-muted">Phone Number</label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}
+                        <div class="text-danger small mt-1">{{ form.phone_number.errors|striptags }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.location.id_for_label }}" class="form-label small fw-semibold text-muted">Delivery City / Area</label>
+                        {{ form.location }}
+                        {% if form.location.errors %}
+                        <div class="text-danger small mt-1">{{ form.location.errors|striptags }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label for="{{ form.default_address.id_for_label }}" class="form-label small fw-semibold text-muted">Full Saved Delivery Address</label>
+                        {{ form.default_address }}
+                        {% if form.default_address.errors %}
+                        <div class="text-danger small mt-1">{{ form.default_address.errors|striptags }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                    <button type="submit" class="btn btn-fk-yellow px-5 py-2.5 fw-bold text-uppercase shadow">
+                        Save Profile Details
+                    </button>
+                    <small class="text-muted"><i class="bi bi-lock-fill me-1"></i>Your information is encrypted & secure</small>
+                </div>
+            </form>
+        </div>
+
+        <!-- Security & Password Change Card -->
+        <div class="fk-card p-4">
+            <div class="d-flex align-items-center justify-content-between pb-3 border-bottom mb-4">
+                <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-shield-lock-fill text-danger me-2"></i>Security & Password Reset</h5>
+                <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Keep your account protected</small>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="change_password" value="1">
+                <h6 class="fw-bold mb-3 text-secondary text-uppercase" style="font-size: 0.85rem; letter-spacing: 0.5px;">Update Password</h6>
+
+                {% if password_form.non_field_errors %}
+                <div class="alert alert-danger p-2 small mb-3">
+                    {% for error in password_form.non_field_errors %}
+                    <div><i class="bi bi-exclamation-circle-fill me-1"></i>{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="row g-3 mb-4">
+                    {% for field in password_form %}
+                    <div class="col-md-4">
+                        <label for="{{ field.id_for_label }}" class="form-label small fw-semibold text-muted">{{ field.label }}</label>
+                        <input type="password" name="{{ field.name }}" class="form-control rounded-1 py-2" id="{{ field.id_for_label }}" required>
+                        {% if field.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ field.errors|striptags }}
+                        </div>
+                        {% endif %}
+                        {% if field.help_text %}
+                        <small class="form-text text-muted d-block mt-1" style="font-size: 0.75rem;">{{ field.help_text|striptags }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                    <button type="submit" class="btn btn-fk-orange px-5 py-2.5 fw-bold text-uppercase shadow">
+                        Update Password
+                    </button>
+                    <span class="small text-muted"><i class="bi bi-shield-check me-1 text-success"></i>Instant Security Update</span>
+                </div>
+            </form>
         </div>
     </div>
 </div>
